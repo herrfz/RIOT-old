@@ -109,19 +109,19 @@ int main(void)
     m.content.ptr = (char *) &msg_b;
     msg_try_send(&m, pid);
 
-    kernel_pid_t pid2 = thread_create(
-                   timer_stack_local,
-                   sizeof(timer_stack_local),
-                   PRIORITY_MAIN - 1,
-                   CREATE_STACKTEST,
-                   timer_thread_local,
-                   NULL,
-                   "timer local");
+//    kernel_pid_t pid2 = thread_create(
+//                   timer_stack_local,
+//                   sizeof(timer_stack_local),
+//                   PRIORITY_MAIN - 1,
+//                   CREATE_STACKTEST,
+//                   timer_thread_local,
+//                   NULL,
+//                   "timer local");
 
     timex_t sleep = timex_set(1, 0);
 
     while (1) {
         vtimer_sleep(sleep);
-        msg_try_send(&m, pid2);
+      //  msg_try_send(&m, pid2);
     }
 }

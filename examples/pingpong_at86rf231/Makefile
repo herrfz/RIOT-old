@@ -1,5 +1,5 @@
 # name of your application
-APPLICATION = hello-world
+APPLICATION = pingpong_at86rf231
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= vesna
@@ -17,5 +17,11 @@ QUIET ?= 1
 
 USEMODULE += vtimer
 USEMODULE += ps
+USEMODULE += transceiver
+USEMODULE += at86rf231
+USEMODULE += netdev_802154
+USEMODULE += ieee802154
+#USEMODULE += config
+
 
 include $(RIOTBASE)/Makefile.include

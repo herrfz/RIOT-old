@@ -80,6 +80,8 @@ int main(void)
 
     printf("starting ccn-lite relay...\n");
     ccnl_riot_relay_start(NULL);
+	 //thread_print_all();
+
 
     return 0;
 }

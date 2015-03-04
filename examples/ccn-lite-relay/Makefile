@@ -2,7 +2,7 @@
 APPLICATION = ccn-lite-relay
 
 # If no BOARD is found in the environment, use this default:
-BOARD ?= native
+BOARD ?= vesna
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
@@ -34,6 +34,7 @@ BOARD_INSUFFICIENT_RAM := chronos msb-430h telosb wsn430-v1_3b wsn430-v1_4 z1 re
 USEMODULE += posix
 
 USEMODULE += defaulttransceiver
-USEMODULE += ccn_lite
+USEMODULE += ccn_lit
+#USEMODULE += ps
 
 include $(RIOTBASE)/Makefile.include

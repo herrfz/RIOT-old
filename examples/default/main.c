@@ -99,7 +99,7 @@ void *radio(void *arg)
             printf("\tRSSI:\t%u\n", p->rssi);
 
             for (i = 0; i < p->length; i++) {
-                printf("%02X ", p->data[i]);
+                puts("%02X ", p->data[i]);
             }
 
             p->processing--;
@@ -157,7 +157,10 @@ int main(void)
 #endif
 
 #ifdef MODULE_TRANSCEIVER
-    init_transceiver();
+    //init_transceiver();
+    kernel_pid_t pid=KERNEL_PID_UNDEF;
+    at86rf231_init(pid);
+
 #endif
 
 #ifdef FEATURE_PERIPH_RTC

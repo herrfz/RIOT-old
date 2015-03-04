@@ -392,7 +392,6 @@ static void receive_packet(uint16_t type, uint8_t pos)
     transceiver_type_t t;
     rx_buffer_pos = pos;
     msg_t m;
-
     DEBUG("Packet received\n");
 
     switch (type) {
@@ -431,7 +430,7 @@ static void receive_packet(uint16_t type, uint8_t pos)
             transceiver_buffer_pos = 0;
         }
     }
-
+    DEBUG("size is %x\n", i);
     /* no buffer left */
     if (i >= TRANSCEIVER_BUFFER_SIZE) {
         /* inform upper layers of lost packet */
@@ -529,6 +528,7 @@ static void receive_packet(uint16_t type, uint8_t pos)
 
         i++;
     }
+
 }
 
 #if (defined(MODULE_CC110X) || defined(MODULE_CC110X_LEGACY))

@@ -41,7 +41,7 @@ int16_t at86rf231_send(at86rf231_packet_t *packet)
     if (result < 0) {
         return result;
     }
-    at86rf231_transmit_tx_buf(NULL);
+   at86rf231_transmit_tx_buf(NULL);
     return result;
 }
 
@@ -171,6 +171,7 @@ netdev_802154_tx_status_t at86rf231_transmit_tx_buf(netdev_t *dev)
 
     /* Start TX */
     at86rf231_reg_write(AT86RF231_REG__TRX_STATE, AT86RF231_TRX_STATE__TX_START);
+
     DEBUG("at86rf231: Started TX\n");
 
     if (!wait_for_ack) {
@@ -231,12 +232,20 @@ int16_t at86rf231_load(at86rf231_packet_t *packet)
     /* calculate size of the frame (payload + FCS) */
     packet->length = ieee802154_frame_get_hdr_len(&packet->frame) +
                      packet->frame.payload_len + 1;
+    ieee802154_frame_get_hdr_len(&packet->frame);
 
     if (packet->length > AT86RF231_MAX_PKT_LENGTH) {
         DEBUG("at86rf231: ERROR: packet too long, dropped it.\n");
         return -1;
     }
 
+    /*print mac header*/
+#if ENABLE_DEBUG
+    printf("\n");
+    printf("******NEW PACKET*****\n");
+    printf("******MAC HEADER*****\n");
+    ieee802154_frame_print_fcf_frame(&packet->frame);
+#endif
     /* FCS is added in hardware */
     uint8_t pkt[packet->length];
 
@@ -269,7 +278,7 @@ int16_t at86rf231_load(at86rf231_packet_t *packet)
 
     /* load packet into fifo */
     at86rf231_write_fifo(pkt, packet->length);
-    DEBUG("at86rf231: Wrote to FIFO\n");
+    DEBUG("at86rf231: Wrote to FIFO and packet length is:%d\n", packet->length);
 
     return packet->length;
 }
@@ -285,11 +294,15 @@ static void at86rf231_gen_pkt(uint8_t *buf, at86rf231_packet_t *packet)
     // add length for at86rf231
     buf[0] = packet->length + 1;
     index++;
-
     offset = index;
-
+    DEBUG("******PAYLOAD*****\n");
     while (index < packet->length) {
         buf[index] = packet->frame.payload[index - offset];
+        DEBUG("%02x  ", buf[index]);
         index += 1;
     }
+    DEBUG("\n");
 }
+
+
+

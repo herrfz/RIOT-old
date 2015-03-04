@@ -1,5 +1,5 @@
 # name of your application
-APPLICATION = hello-world
+APPLICATION = temperature
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= vesna
@@ -16,6 +16,6 @@ CFLAGS += -DDEVELHELP
 QUIET ?= 1
 
 USEMODULE += vtimer
-USEMODULE += ps
+
 
 include $(RIOTBASE)/Makefile.include

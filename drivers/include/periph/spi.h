@@ -94,7 +94,7 @@ typedef enum {
     SPI_SPEED_400KHZ,           /**< drive the SPI bus with 400KHz */
     SPI_SPEED_1MHZ,             /**< drive the SPI bus with 1MHz */
     SPI_SPEED_5MHZ,             /**< drive the SPI bus with 5MHz */
-    SPI_SPEED_10MHZ             /**< drive the SPI bus with 10MHz */
+    SPI_SPEED_10MHZ,             /**< drive the SPI bus with 10MHz */
 } spi_speed_t;
 
 /**
@@ -254,3 +254,15 @@ void spi_poweroff(spi_t dev);
 
 #endif /* __SPI_H */
 /** @} */
+
+#define CR1_CLEAR_Mask                   ((uint16_t)0x3040)
+#define SPI_Direction_2Lines_FullDuplex  ((uint16_t)0x0000)
+#define SPI_Mode_Master                  ((uint16_t)0x0104)
+#define SPI_DataSize_8b                  ((uint16_t)0x0000)
+#define SPI_CPOL_Low                     ((uint16_t)0x0000)
+#define SPI_CPHA_1Edge                   ((uint16_t)0x0000)
+#define SPI_NSS_Soft                     ((uint16_t)0x0200)
+#define SPI_BaudRatePrescaler_4          ((uint16_t)0x0008)
+#define SPI_FirstBit_MSB                 ((uint16_t)0x0000)
+#define CR1_CLEAR_Mask                   ((uint16_t)0x3040)
+#define SPI_Mode_Select                  ((uint16_t)0xF7FF)

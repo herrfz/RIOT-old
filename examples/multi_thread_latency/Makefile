@@ -1,5 +1,5 @@
 # name of your application
-APPLICATION = hello-world
+APPLICATION = multi_thread_latency
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= vesna
@@ -17,5 +17,6 @@ QUIET ?= 1
 
 USEMODULE += vtimer
 USEMODULE += ps
+
 
 include $(RIOTBASE)/Makefile.include

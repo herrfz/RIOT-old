@@ -102,7 +102,7 @@ int main(void)
     ringbuffer_init(&tx_buf, tx_mem, 128);
 
     printf("Initializing UART @ %i", BAUD);
-    if (uart_init(DEV, BAUD, rx, tx, 0) >= 0) {
+    if (uart_init(DEV, BAUD, NULL, tx, 0) >= 0) {
         puts("   ...done");
     }
     else {
@@ -118,11 +118,11 @@ int main(void)
         msg_t msg;
         msg_receive(&msg);
 
-        printf("RECEIVED INPUT: ");
+        printf("RECEIVED INPUT:\n ");
         char buf[128];
         int res = ringbuffer_get(&rx_buf, buf, rx_buf.avail);
         buf[res] = '\0';
-        printf("%s", buf);
+        printf("%s\n", buf);
     }
 
     return 0;

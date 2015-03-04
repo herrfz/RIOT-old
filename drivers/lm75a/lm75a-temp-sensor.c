@@ -33,7 +33,7 @@
 #include "thread.h"
 #include "vtimer.h"
 #include "timex.h"
-#include "lpc2387.h"
+//#include "lpc2387.h"
 #include "gpioint.h"
 #include "i2c.h"
 #include "lm75a-temp-sensor.h"

@@ -1,5 +1,5 @@
 # name of your application
-APPLICATION = hello-world
+APPLICATION = cc1101
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= vesna
@@ -15,7 +15,10 @@ CFLAGS += -DDEVELHELP
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
-USEMODULE += vtimer
-USEMODULE += ps
+#USEMODULE += vtimer
+#USEMODULE += cc110x_legacy
+#USEMODULE += transceiver
+USEMODULE += at86rf231
+#USEMODULE += ieee802154
 
 include $(RIOTBASE)/Makefile.include
