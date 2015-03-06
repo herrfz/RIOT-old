@@ -48,7 +48,7 @@
 
 #define ENABLE_DEBUG    (0)
 #if ENABLE_DEBUG
-char addr_str[IPV6_MAX_ADDR_STR_LEN];
+static char addr_str[IPV6_MAX_ADDR_STR_LEN];
 #endif
 #include "debug.h"
 
@@ -895,9 +895,9 @@ uint8_t lowpan_iphc_encoding(int if_id, const uint8_t *dest, int dest_len,
         if (!net_if_get_eui64(&own_iid, if_id, 0)) {
             return 1;
         }
-
-        own_iid.uint8[0] ^= 0x02;
     }
+
+    own_iid.uint8[0] ^= 0x02;
 
     ipv6_buf = ipv6_buf_extra;
 
@@ -1428,7 +1428,7 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length, net_if_eui64_t *s_addr,
                 /* 0-bits */
                 memcpy(&(ipv6_buf->destaddr.uint8[0]), &ll_prefix[0], 2);
                 memset(&(ipv6_buf->destaddr.uint8[2]), 0, 6);
-                memcpy(&(ipv6_buf->destaddr.uint8[8]), &s_addr->uint8[0], 8);
+                memcpy(&(ipv6_buf->destaddr.uint8[8]), &d_addr->uint8[0], 8);
                 /* Invert Universal/local bit as specified in
                  * RFC4291, section 2.5.1 "Interface Identifiers" */
                 ipv6_buf->destaddr.uint8[8] ^= 0x02;
