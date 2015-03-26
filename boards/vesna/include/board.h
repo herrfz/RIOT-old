@@ -90,15 +90,15 @@ extern "C" {
 /**
  * dummy LED macros
  */
-#define LED_RED_ON              (0)
-#define LED_RED_OFF             (0)
-#define LED_RED_TOGGLE          (0)
+#define LED_RED_ON              
+#define LED_RED_OFF             
+#define LED_RED_TOGGLE          
 
-#define LED_GREEN_TOGGLE        (0)
+#define LED_GREEN_TOGGLE        
 
-#define LED_ORANGE_ON              (0)
-#define LED_ORANGE_OFF             (0)
-#define LED_ORANGE_TOGGLE          (0)
+#define LED_ORANGE_ON              
+#define LED_ORANGE_OFF             
+#define LED_ORANGE_TOGGLE          
 
 
 /**

@@ -1,6 +1,6 @@
 
 #include "board.h"
-#include "adc.h"
+//#include "adc.h"
 
 /** V25 (temperature sensor voltage at 25 C) value from STM32F103 datasheet.
  *
@@ -25,7 +25,7 @@ float vsnTemperature_avgSlope = 4.3e-3;
 /** Read raw sensor value. */
 uint16_t vsnTemperature_readRaw(void)
 {
-    adc_init(ADC_0, ADC_RES_8BIT);
+//    adc_init(ADC_0, ADC_RES_8BIT);
 
 /*Set the TSVREFE bit in the ADC_CR2 to wake up the temperature sensor from power down mode*/
 
