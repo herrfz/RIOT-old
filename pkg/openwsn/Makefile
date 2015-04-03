@@ -1,6 +1,5 @@
 PKG_NAME=openwsn
-PKG_URL=https://github.com/openwsn-berkeley/openwsn-fw.git
-PKG_VERSION=ff25e5d0ae5d344ed793a724d60532fb917bf1f8
+PKG_URL=https://github.com/herrfz/OpenWSN-RIOT.git
 PKG_DIR=../../../$(PKG_NAME)
 
 ifneq ($(RIOTBOARD),)
@@ -14,8 +13,7 @@ all: patch
 	"$(MAKE)" -C $(PKG_DIR)
 
 patch:
-	test -d "$(PKG_DIR)" || git clone "$(PKG_URL)" "$(PKG_DIR)"; \
-		cd "$(PKG_DIR)" && git checkout -f "$(PKG_VERSION)" && git am --ignore-whitespace $(CURDIR)/*.patch
+	test -d "$(PKG_DIR)" || git clone "$(PKG_URL)" "$(PKG_DIR)"
 
 clean:
 	@echo "Cleaning up OpenWSN package..."
