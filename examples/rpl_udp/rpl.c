@@ -44,7 +44,7 @@ radio_address_t id;
 
 static uint8_t is_root = 0;
 
-void rpl_udp_init(int argc, char **argv)
+int rpl_udp_init(int argc, char **argv)
 {
     transceiver_command_t tcmd;
     msg_t m;
@@ -55,7 +55,7 @@ void rpl_udp_init(int argc, char **argv)
         printf("\tr\tinitialize as root\n");
         printf("\tn\tinitialize as node router\n");
         printf("\th\tinitialize as non-routing node (host-mode)\n");
-        return;
+        return 1;
     }
 
     char command = argv[1][0];
@@ -67,7 +67,7 @@ void rpl_udp_init(int argc, char **argv)
 #if (defined(MODULE_CC110X) || defined(MODULE_CC110X_LEGACY) || defined(MODULE_CC110X_LEGACY_CSMA))
         if (!id || (id > 255)) {
             printf("ERROR: address not a valid 8 bit integer\n");
-            return;
+            return 1;
         }
 #endif
 
@@ -91,30 +91,51 @@ void rpl_udp_init(int argc, char **argv)
         msg_send_receive(&m, &m, transceiver_pid);
         if( chan == UNASSIGNED_CHANNEL ) {
             puts("ERROR: channel NOT set! Aborting initialization.");
-            return;
+            return 1;
         }
 
         printf("Channel set to %" PRIi32 "\n", chan);
 
+        /* global address */
+        ipv6_addr_t global_addr, global_prefix;
+        ipv6_addr_init(&global_prefix, 0xabcd, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0);
+        ipv6_addr_set_by_eui64(&global_addr, 0, &global_prefix);
+
         if (command != 'h') {
             DEBUGF("Initializing RPL for interface 0\n");
-            uint8_t state = rpl_init(0);
+
+            uint8_t state = SIXLOWERROR_VALUE;
+            if (command == 'n') {
+                /*
+                 * no global address specified, we'll use auto address config
+                 * initiated by the root node
+                 */
+                state = rpl_init(0, NULL);
+            }
+            else if (command == 'r') {
+                rpl_options_t rpl_opts = {
+                    .instance_id = 0,
+                    .prefix = global_prefix,
+                    .prefix_len = 64,
+                    .prefix_flags = RPL_PREFIX_INFO_AUTO_ADDR_CONF,
+                    /* autonomous address-configuration */
+                };
+
+                /* use specific global address */
+                state = rpl_init(0, &global_addr);
+                rpl_init_root(&rpl_opts);
+                is_root = 1;
+            }
 
             if (state != SIXLOWERROR_SUCCESS) {
-                printf("Error initializing RPL\n");
+                puts("Error initializing RPL");
             }
             else {
                 puts("6LoWPAN and RPL initialized.");
             }
 
-            if (command == 'r') {
-                rpl_init_root();
-                ipv6_iface_set_routing_provider(rpl_get_next_hop);
-                is_root = 1;
-            }
-            else {
-                ipv6_iface_set_routing_provider(rpl_get_next_hop);
-            }
+            ipv6_iface_set_routing_provider(rpl_get_next_hop);
+
         }
         else {
             puts("6LoWPAN initialized.");
@@ -135,16 +156,8 @@ void rpl_udp_init(int argc, char **argv)
     }
     else {
         printf("ERROR: Unknown command '%c'\n", command);
-        return;
+        return 1;
     }
-
-    /* add global address */
-    ipv6_addr_t tmp;
-    /* initialize prefix */
-    ipv6_addr_init(&tmp, 0xabcd, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, id);
-    /* set host suffix */
-    ipv6_addr_set_by_eui64(&tmp, 0, &tmp);
-    ipv6_net_if_add_addr(0, &tmp, NDP_ADDR_STATE_PREFERRED, 0, 0, 0);
 
     if (command != 'h') {
         ipv6_init_as_router();
@@ -152,9 +165,11 @@ void rpl_udp_init(int argc, char **argv)
 
     puts("Transport layer initialized");
     /* start transceiver watchdog */
+
+    return 0;
 }
 
-void rpl_udp_dodag(int argc, char **argv)
+int rpl_udp_dodag(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
@@ -165,7 +180,7 @@ void rpl_udp_dodag(int argc, char **argv)
     if (mydodag == NULL) {
         printf("Not part of a dodag\n");
         printf("---------------------------\n");
-        return;
+        return 1;
     }
 
     printf("Part of Dodag:\n");
@@ -180,4 +195,6 @@ void rpl_udp_dodag(int argc, char **argv)
     }
 
     printf("---------------------------\n");
+
+    return 0;
 }

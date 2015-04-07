@@ -19,8 +19,8 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef __THREAD_H
-#define __THREAD_H
+#ifndef THREAD_H
+#define THREAD_H
 
 #include "kernel.h"
 #include "tcb.h"
@@ -67,6 +67,9 @@
  *  - CREATE_WOUT_YIELD     the newly created thread will not run immediately after creation
  *  - CREATE_STACKTEST      write markers into the thread's stack to measure the stack's memory
  *                          usage (for debugging and profiling purposes)
+ *
+ * @note Currently we support creating threads from within an ISR, however it is considered
+ *       to be a bad programming practice and we strongly discourage it.
  *
  * @param[out] stack    start address of the preallocated stack memory
  * @param[in] stacksize the size of the thread's stack in bytes
@@ -189,4 +192,4 @@ uintptr_t thread_measure_stack_free(char *stack);
 #endif
 
 /** @} */
-#endif /* __THREAD_H */
+#endif /* THREAD_H */

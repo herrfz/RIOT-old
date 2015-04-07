@@ -64,7 +64,6 @@ int lis3dh_init(lis3dh_t *dev, spi_t spi, gpio_t cs_pin, gpio_t int1_pin, gpio_t
 
 int lis3dh_read_xyz(const lis3dh_t *dev, lis3dh_data_t *acc_data)
 {
-    int32_t tmp;
     uint8_t i;
     /* Set READ MULTIPLE mode */
     static const uint8_t addr = (LIS3DH_REG_OUT_X_L | LIS3DH_SPI_READ_MASK | LIS3DH_SPI_MULTI_MASK);
@@ -77,6 +76,9 @@ int lis3dh_read_xyz(const lis3dh_t *dev, lis3dh_data_t *acc_data)
     if (spi_transfer_regs(dev->spi, addr, NULL, (char *)acc_data,
                           sizeof(lis3dh_data_t)) != sizeof(lis3dh_data_t)) {
         /* Transfer error */
+        gpio_set(dev->cs);
+        /* Release the bus for other threads. */
+        spi_release(dev->spi);
         return -1;
     }
 
@@ -86,7 +88,7 @@ int lis3dh_read_xyz(const lis3dh_t *dev, lis3dh_data_t *acc_data)
 
     /* Scale to milli-G */
     for (i = 0; i < 3; ++i) {
-        tmp = (int32_t)(((int16_t *)acc_data)[i]);
+        int32_t tmp = (int32_t)(((int16_t *)acc_data)[i]);
         tmp *= dev->scale;
         tmp /= 32768;
         (((int16_t *)acc_data)[i]) = (int16_t)tmp;
@@ -190,6 +192,9 @@ static int lis3dh_read_regs(const lis3dh_t *dev, const lis3dh_reg_t reg, const u
 
     if (spi_transfer_regs(dev->spi, addr, NULL, (char *)buf, len) < 0) {
         /* Transfer error */
+        gpio_set(dev->cs);
+        /* Release the bus for other threads. */
+        spi_release(dev->spi);
         return -1;
     }
 
@@ -221,6 +226,9 @@ static int lis3dh_write_reg(const lis3dh_t *dev, const lis3dh_reg_t reg, const u
 
     if (spi_transfer_reg(dev->spi, addr, value, NULL) < 0) {
         /* Transfer error */
+        gpio_set(dev->cs);
+        /* Release the bus for other threads. */
+        spi_release(dev->spi);
         return -1;
     }
 

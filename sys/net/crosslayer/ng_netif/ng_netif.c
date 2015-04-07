@@ -18,12 +18,16 @@
 #include "kernel_types.h"
 #include "net/ng_netif.h"
 
-static ng_netif_handler_t if_handler[] = {
-#ifdef MODULE_NG_IPV6
-    { ipv6_if_add, ipv6_if_remove },
+#ifdef MODULE_NG_IPV6_NETIF
+#include "net/ng_ipv6/netif.h"
 #endif
-    /* #ifdef MODULE_NG_IPV4
-     *  { ipv4_if_add, ipv4_if_remove },
+
+static ng_netif_handler_t if_handler[] = {
+#ifdef MODULE_NG_IPV6_NETIF
+    { ng_ipv6_netif_add, ng_ipv6_netif_remove },
+#endif
+    /* #ifdef MODULE_NG_IPV4_NETIF
+     *  { ipv4_netif_add, ipv4_netif_remove },
      * #endif ... you get the idea
      */
     { NULL, NULL }
@@ -60,7 +64,9 @@ int ng_netif_add(kernel_pid_t pid)
 
 void ng_netif_remove(kernel_pid_t pid)
 {
-    for (int i = 0; i < NG_NETIF_NUMOF; i++) {
+    int i;
+
+    for (i = 0; i < NG_NETIF_NUMOF; i++) {
         if (ifs[i] == pid) {
             ifs[i] = KERNEL_PID_UNDEF;
 
@@ -68,10 +74,15 @@ void ng_netif_remove(kernel_pid_t pid)
                 if_handler[j].remove(pid);
             }
 
-            return;
+            break;
         }
     }
 
+    for (; (i < (NG_NETIF_NUMOF - 1)) && (ifs[i + 1] != KERNEL_PID_UNDEF); i++) {
+        ifs[i] = ifs[i + 1];
+    }
+
+    ifs[i] = KERNEL_PID_UNDEF;  /* set in case of i == (NG_NETIF_NUMOF - 1) */
 }
 
 kernel_pid_t *ng_netif_get(size_t *size)
