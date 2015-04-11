@@ -89,10 +89,9 @@ void *second_thread(void *arg)
 
         if(iteration < test_repeats){  //while there are iterations
             if (pid == LATENCY_THR_PID){
-
             #if VITMER_MSG
                 vtimer_set_msg(&timer, interval, thread_getpid(), 0, msg_a );
-                int dummy = 0; // do dummy stuff so as not opt. by compiler 
+                unsigned volatile int dummy = 0; // do dummy stuff so as not opt. by compiler 
                 for (temp = 0; temp < 10000; temp++) // with 8MHz clock this lasts ca. 0.125ms
                     dummy++;
                 msg_receive(&m_a);
@@ -140,8 +139,7 @@ int main(void)
     int min_time_l = 0;
     int min_time_flag = 1;
 
-    /*Define where are receiving message from thread*/
-    msg_t m_receive; //Allocate the receive message in main
+    msg_t m_finish; //Allocate the receive message in main
 
     /*Init program*/
     printf("# ********************************************* \n");
@@ -161,7 +159,7 @@ int main(void)
     LED_GREEN_ON; //indicate test start
     
     /*Init latency vector*/
-    for(j = 0 ; j < MAX_LATENCY; j++) {
+    for(j = 0; j < MAX_LATENCY; j++) {
         latency[j] = c;
         c += 1;
     }
@@ -178,7 +176,7 @@ int main(void)
 #endif
 
     /*Creating multiple threads*/
-    for(th=0 ; th < THRNUM; th++){
+    for(th = 0; th < THRNUM; th++){
         sprintf(buffer[th], "th_back_%d", th);
     #if DIFF_PRIORITY
         if (LATENCY_THR_PID == th + 3)  //Creating thread latency with major priority
@@ -186,7 +184,6 @@ int main(void)
         else
             priority = 1;
     #endif
-
         pid = thread_create(stack[th],
                 KERNEL_CONF_STACKSIZE_MAIN,
             #if DIFF_PRIORITY
@@ -200,13 +197,14 @@ int main(void)
                 buffer[th]);
                 num_thread[pid] = th;
     }
-    msg_receive(&m_receive); //waiting for receive message from main
+
+    msg_receive(&m_finish); //wait for finish signal from latency thread 
     printf("# Test finish\n");
     printf("# printing histogram\n");
     vtimer_usleep(SEC);
 
     /*print out values*/
-    for(n = 0; n < MAX_LATENCY ; n++) {
+    for(n = 0; n < MAX_LATENCY; n++) {
         printf("%03i %i\n", latency[n], count[n]);
 
         /*Get the maximum repetitions*/
@@ -230,6 +228,7 @@ int main(void)
             }
         }
     }
+
     printf("# MAX latency is: %i microseconds in %i repetitions\n", max_time_l, max_time_c);
     printf("# MOST COMMON latency is: %i microseconds in %i repetitions\n", max_l, max_c);
     printf("# MIN latency is: %i microseconds in %i repetitions\n", min_time_l, min_time_c);
