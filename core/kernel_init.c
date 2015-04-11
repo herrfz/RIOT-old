@@ -94,7 +94,7 @@ void kernel_init(void)
         printf("kernel_init(): error creating main task.\n");
     }
 
-    printf("#kernel_init(): jumping into first task...\n");
+    printf("kernel_init(): jumping into first task...\n");
 
     cpu_switch_context_exit();
 }

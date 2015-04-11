@@ -157,10 +157,7 @@ int main(void)
 #endif
 
 #ifdef MODULE_TRANSCEIVER
-    //init_transceiver();
-    kernel_pid_t pid=KERNEL_PID_UNDEF;
-    at86rf231_init(pid);
-
+    init_transceiver();
 #endif
 
 #ifdef FEATURE_PERIPH_RTC

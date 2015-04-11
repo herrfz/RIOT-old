@@ -1,5 +1,5 @@
 # name of your application
-APPLICATION = ipc_pingpong
+APPLICATION = hello-world
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= vesna
@@ -12,10 +12,9 @@ RIOTBASE ?= $(CURDIR)/../..
 # development process:
 CFLAGS += -DDEVELHELP
 
-USEMODULE += ps
-USEMODULE += vtimer
-
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
+
+USEMODULE += vtimer
 
 include $(RIOTBASE)/Makefile.include

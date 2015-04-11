@@ -23,7 +23,11 @@
 
 #include "thread.h"
 #include "msg.h"
+#include "vtimer.h"
 #include <ps.h>
+
+#define MSEC 1000
+#define SEC  (1000 * MSEC)
 
 void *second_thread(void *arg)
 {
@@ -35,6 +39,7 @@ void *second_thread(void *arg)
     while (1) {
         msg_receive(&m);
         printf("2nd: Got msg from %" PRIkernel_pid "\n", m.sender_pid);
+        vtimer_usleep(SEC);
         m.content.value++;
         msg_reply(&m, &m);
 		printf("task table in thread: \n");
