@@ -92,7 +92,9 @@ void *second_thread(void *arg)
 
             #if VITMER_MSG
                 vtimer_set_msg(&timer, interval, thread_getpid(), 0, msg_a );
-                for (temp=0; temp < 100 ;temp++){}
+                int dummy = 0; // do dummy stuff so as not opt. by compiler 
+                for (temp = 0; temp < 10000; temp++) // with 8MHz clock this lasts ca. 0.125ms
+                    dummy++;
                 msg_receive(&m_a);
             #else
                 vtimer_usleep(interval.microseconds); // sleep
