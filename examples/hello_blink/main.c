@@ -27,25 +27,28 @@
 
 int main(void)
 {
-	timex_t now;
+    timex_t now;
 
-	while(1)
-	{
-		/* Test if leds are working */
-		LED_GREEN_ON;
-		vtimer_usleep(SEC);
-		LED_GREEN_OFF;
-		vtimer_usleep(SEC);
+    while(1)
+    {
+        /* Test if leds are working */
+        //LED_GREEN_ON;
+        //vtimer_usleep(SEC);
+        //LED_GREEN_OFF;
+        //vtimer_usleep(SEC);
 
-		/* Test UART */
-		puts("Hello World!");
-		printf("You are running RIOT on a(n) %s board.\n", RIOT_BOARD);
-		printf("This board features a(n) %s MCU.\n", RIOT_MCU);
+        LED_GREEN_TOGGLE;
+        vtimer_usleep(SEC);
 
-		/* TEST CURRENT TIME */
-		vtimer_now(&now);
-		printf("now is second: %lu\n", now.seconds);
-		printf("now is microseconds: %lu\n", now.microseconds);
-	}
+        /* Test UART */
+        puts("Hello World!");
+        printf("You are running RIOT on a(n) %s board.\n", RIOT_BOARD);
+        printf("This board features a(n) %s MCU.\n", RIOT_MCU);
+
+        /* TEST CURRENT TIME */
+        vtimer_now(&now);
+        printf("now is second: %lu\n", now.seconds);
+        printf("now is microseconds: %lu\n", now.microseconds);
+    }
     return 0;
 }
