@@ -25,6 +25,8 @@
 #include "stm32f407xx.h"
 #elif defined CPU_MODEL_STM32F415RG
 #include "stm32f415xx.h"
+#elif defined CPU_MODEL_STM32F411RE
+#include "stm32f411xe.h"
 #endif
 
 /**
@@ -65,6 +67,16 @@
 #ifdef MODULE_CC110X
 #define TRANSCEIVER_BUFFER_SIZE         (10)
 #define RX_BUF_SIZE                     (10)
+#endif
+/** @} */
+
+/**
+ * @name AT86RF231 buffer size definitions for the stm32f4
+ * @{
+ */
+#ifdef MODULE_AT86RF231
+#define TRANSCEIVER_BUFFER_SIZE         (128)
+#define RX_BUF_SIZE                     (128)
 #endif
 /** @} */
 
