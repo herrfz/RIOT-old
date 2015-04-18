@@ -25,34 +25,38 @@
 
 #include "dummyradio_spi.h"
 #include "dummyradio.h"
-#include "board.h"
-#include "periph/spi.h"
-#include "periph/gpio.h"
+
+/*                           len   fcf         seq   dstpan      dstaddr     srcpan      srcaddr     payload     lqi  */
+static uint8_t fifo_reg[] = {0x0e, 0x01, 0x88, 0x00, 0xff, 0xff, 0xff, 0xff, 0x1c, 0xaa, 0x00, 0x00, 0xca, 0xfe, 0x01};
 
 void dummyradio_reg_write(uint8_t addr, uint8_t value)
 {
-    printf("dummyradio_reg_write: %d\n", value);
+    printf("dummyradio_reg_write: %02x\n", value);
 }
 
 uint8_t dummyradio_reg_read(uint8_t addr)
 {
-    printf("dummyradio_reg_read\n");
+    puts("dummyradio_reg_read\n");
     return 0;
 }
 
 void dummyradio_read_fifo(uint8_t *data, radio_packet_length_t length)
 {
-    memset(data, 0, length);
+    memcpy(data, fifo_reg, length);
     printf("dummyradio_read_fifo: %d\n", length);
 }
 
 void dummyradio_write_fifo(const uint8_t *data, radio_packet_length_t length)
 {
-    printf("dummyradio_write_fifo: %d\n", length);
+    puts("dummyradio_write_fifo \n");
+    for (int i = 0; i < length; i++) {
+        printf("%02x ", data[i]);
+    }
+    puts("\n");
 }
 
 uint8_t dummyradio_get_status(void)
 {
-    printf("dummyradio_get_status\n");
+    puts("dummyradio_get_status\n");
     return 0;
 }

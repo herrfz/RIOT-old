@@ -54,6 +54,7 @@ netdev_rcv_data_cb_t dummyradio_data_packet_cb;
 static size_t _default_src_addr_len = 2;
 
 uint8_t  driver_state;
+int      monitor_mode;
 
 void dummyradio_gpio_spi_interrupts_init(void);
 void dummyradio_reset(void);
@@ -83,19 +84,11 @@ int dummyradio_initialize(netdev_t *dev)
     dummyradio_set_pan(0x0001);
 #endif
 
-    radio_channel = dummyradio_reg_read(DUMMYRADIO_REG__PHY_CC_CCA) & DUMMYRADIO_PHY_CC_CCA_MASK__CHANNEL;
+    radio_channel = 0;
 
-    radio_address = 0x00FF & (uint16_t)dummyradio_reg_read(DUMMYRADIO_REG__SHORT_ADDR_0);
-    radio_address |= dummyradio_reg_read(DUMMYRADIO_REG__SHORT_ADDR_1) << 8;
+    radio_address = 0x010F;
 
-    radio_address_long = 0x00000000000000FF & (uint64_t)dummyradio_reg_read(DUMMYRADIO_REG__IEEE_ADDR_0);
-    radio_address_long |= ((uint64_t)dummyradio_reg_read(DUMMYRADIO_REG__IEEE_ADDR_1)) << 8;
-    radio_address_long |= ((uint64_t)dummyradio_reg_read(DUMMYRADIO_REG__IEEE_ADDR_1)) << 16;
-    radio_address_long |= ((uint64_t)dummyradio_reg_read(DUMMYRADIO_REG__IEEE_ADDR_1)) << 24;
-    radio_address_long |= ((uint64_t)dummyradio_reg_read(DUMMYRADIO_REG__IEEE_ADDR_1)) << 32;
-    radio_address_long |= ((uint64_t)dummyradio_reg_read(DUMMYRADIO_REG__IEEE_ADDR_1)) << 40;
-    radio_address_long |= ((uint64_t)dummyradio_reg_read(DUMMYRADIO_REG__IEEE_ADDR_1)) << 48;
-    radio_address_long |= ((uint64_t)dummyradio_reg_read(DUMMYRADIO_REG__IEEE_ADDR_1)) << 56;
+    radio_address_long = 0x010203040506010F;
 
     return 0;
 }
@@ -118,18 +111,6 @@ int dummyradio_is_on(void)
 
 void dummyradio_switch_to_rx(void)
 {
-    // gpio_irq_disable(DUMMYRADIO_INT);
-
-    /* now change to PLL_ON state for extended operating mode */
-    dummyradio_reg_write(DUMMYRADIO_REG__TRX_STATE, DUMMYRADIO_TRX_STATE__PLL_ON);
-
-    // do {
-    //     int max_wait = _MAX_RETRIES;
-    //     if (!--max_wait) {
-    //         DEBUG("dummyradio : ERROR : could not enter PLL_ON mode\n");
-    //         break;
-    //     }
-    // } while (dummyradio_get_status() != DUMMYRADIO_TRX_STATUS__PLL_ON);
 
 #ifndef MODULE_OPENWSN
     /* Reset IRQ to TRX END only */
@@ -139,23 +120,6 @@ void dummyradio_switch_to_rx(void)
     dummyradio_reg_write(DUMMYRADIO_REG__IRQ_MASK, ( DUMMYRADIO_IRQ_STATUS_MASK__RX_START | DUMMYRADIO_IRQ_STATUS_MASK__TRX_END));
 #endif
 
-
-    /* Read IRQ to clear it */
-    dummyradio_reg_read(DUMMYRADIO_REG__IRQ_STATUS);
-
-    /* Enable IRQ interrupt */
-    // gpio_irq_enable(DUMMYRADIO_INT);
-
-    /* Enter RX_AACK_ON state */
-    dummyradio_reg_write(DUMMYRADIO_REG__TRX_STATE, DUMMYRADIO_TRX_STATE__RX_AACK_ON);
-
-    // do {
-    //     int max_wait = _MAX_RETRIES;
-    //     if (!--max_wait) {
-    //         DEBUG("dummyradio : ERROR : could not enter RX_AACK_ON mode\n");
-    //         break;
-    //     }
-    // } while (dummyradio_get_status() != DUMMYRADIO_TRX_STATUS__RX_AACK_ON);
 }
 
 void dummyradio_rxoverflow_irq(void)
@@ -231,37 +195,6 @@ radio_address_t dummyradio_set_address(radio_address_t address)
 {
     radio_address = address;
 
-    uint8_t old_state = dummyradio_get_status() & DUMMYRADIO_TRX_STATUS_MASK__TRX_STATUS;
-
-    /* Go to state PLL_ON */
-    dummyradio_reg_write(DUMMYRADIO_REG__TRX_STATE, DUMMYRADIO_TRX_STATE__PLL_ON);
-
-    /* wait until it is on PLL_ON state */
-    // do {
-    //     int max_wait = _MAX_RETRIES;
-    //     if (!--max_wait) {
-    //         DEBUG("dummyradio : ERROR : could not enter PLL_ON mode\n");
-    //         break;
-    //     }
-    // } while ((dummyradio_get_status() & DUMMYRADIO_TRX_STATUS_MASK__TRX_STATUS)
-    //          != DUMMYRADIO_TRX_STATUS__PLL_ON);
-
-    dummyradio_reg_write(DUMMYRADIO_REG__SHORT_ADDR_0, (uint8_t)(0x00FF & radio_address));
-    dummyradio_reg_write(DUMMYRADIO_REG__SHORT_ADDR_1, (uint8_t)(radio_address >> 8));
-
-    /* Go to state old state */
-    dummyradio_reg_write(DUMMYRADIO_REG__TRX_STATE, old_state);
-
-    /* wait until it is on old state */
-    // do {
-    //     int max_wait = _MAX_RETRIES;
-    //     if (!--max_wait) {
-    //         DEBUG("dummyradio : ERROR : could not enter old state %x\n", old_state);
-    //         break;
-    //     }
-    // } while ((dummyradio_get_status() & DUMMYRADIO_TRX_STATUS_MASK__TRX_STATUS)
-    //          != old_state);
-
     return radio_address;
 }
 
@@ -274,43 +207,6 @@ uint64_t dummyradio_set_address_long(uint64_t address)
 {
     radio_address_long = address;
 
-    uint8_t old_state = dummyradio_get_status() & DUMMYRADIO_TRX_STATUS_MASK__TRX_STATUS;
-
-    /* Go to state PLL_ON */
-    dummyradio_reg_write(DUMMYRADIO_REG__TRX_STATE, DUMMYRADIO_TRX_STATE__PLL_ON);
-
-    /* wait until it is on PLL_ON state */
-    // do {
-    //     int max_wait = _MAX_RETRIES;
-    //     if (!--max_wait) {
-    //         DEBUG("dummyradio : ERROR : could not enter PLL_ON mode\n");
-    //         break;
-    //     }
-    // } while ((dummyradio_get_status() & DUMMYRADIO_TRX_STATUS_MASK__TRX_STATUS)
-    //          != DUMMYRADIO_TRX_STATUS__PLL_ON);
-
-    dummyradio_reg_write(DUMMYRADIO_REG__IEEE_ADDR_0, (uint8_t)(radio_address_long));
-    dummyradio_reg_write(DUMMYRADIO_REG__IEEE_ADDR_1, (uint8_t)(radio_address_long >> 8));
-    dummyradio_reg_write(DUMMYRADIO_REG__IEEE_ADDR_2, (uint8_t)(radio_address_long >> 16));
-    dummyradio_reg_write(DUMMYRADIO_REG__IEEE_ADDR_3, (uint8_t)(radio_address_long >> 24));
-    dummyradio_reg_write(DUMMYRADIO_REG__IEEE_ADDR_4, (uint8_t)(radio_address_long >> 32));
-    dummyradio_reg_write(DUMMYRADIO_REG__IEEE_ADDR_5, (uint8_t)(radio_address_long >> 40));
-    dummyradio_reg_write(DUMMYRADIO_REG__IEEE_ADDR_6, (uint8_t)(radio_address_long >> 48));
-    dummyradio_reg_write(DUMMYRADIO_REG__IEEE_ADDR_7, (uint8_t)(radio_address_long >> 56));
-
-    /* Go to state old state */
-    dummyradio_reg_write(DUMMYRADIO_REG__TRX_STATE, old_state);
-
-    /* wait until it is on old state */
-    // do {
-    //     int max_wait = _MAX_RETRIES;
-    //     if (!--max_wait) {
-    //         DEBUG("dummyradio : ERROR : could not enter old state %x\n", old_state);
-    //         break;
-    //     }
-    // } while ((dummyradio_get_status() & DUMMYRADIO_TRX_STATUS_MASK__TRX_STATUS)
-    //          != old_state);
-
     return radio_address_long;
 }
 
@@ -322,9 +218,6 @@ uint64_t dummyradio_get_address_long(void)
 uint16_t dummyradio_set_pan(uint16_t pan)
 {
     radio_pan = pan;
-
-    dummyradio_reg_write(DUMMYRADIO_REG__PAN_ID_0, (uint8_t)(0x00FF & radio_pan));
-    dummyradio_reg_write(DUMMYRADIO_REG__PAN_ID_1, (uint8_t)(radio_pan >> 8));
 
     return radio_pan;
 }
@@ -346,8 +239,6 @@ int dummyradio_set_channel(unsigned int channel)
         return -1;
     }
 
-    dummyradio_reg_write(DUMMYRADIO_REG__PHY_CC_CCA, (radio_channel & DUMMYRADIO_PHY_CC_CCA_MASK__CHANNEL));
-
     return radio_channel;
 }
 
@@ -358,20 +249,12 @@ unsigned int dummyradio_get_channel(void)
 
 void dummyradio_set_monitor(int mode)
 {
-    /* read register */
-    uint8_t tmp = dummyradio_reg_read(DUMMYRADIO_REG__XAH_CTRL_1);
-    /* set promicuous mode depending on *mode* */
-    if (mode) {
-        dummyradio_reg_write(DUMMYRADIO_REG__XAH_CTRL_1, (tmp|DUMMYRADIO_XAH_CTRL_1__AACK_PROM_MODE));
-    }
-    else {
-        dummyradio_reg_write(DUMMYRADIO_REG__XAH_CTRL_1, (tmp&(~DUMMYRADIO_XAH_CTRL_1__AACK_PROM_MODE)));
-    }
+    monitor_mode = mode;
 }
 
 int dummyradio_get_monitor(void)
 {
-    return (dummyradio_reg_read(DUMMYRADIO_REG__XAH_CTRL_1) & DUMMYRADIO_XAH_CTRL_1__AACK_PROM_MODE);
+    return monitor_mode;
 }
 
 void dummyradio_gpio_spi_interrupts_init(void)

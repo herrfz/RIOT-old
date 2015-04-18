@@ -50,7 +50,7 @@ int main(void)
 	DEBUG("PAN is: %x \n", pan);
 
 	/* define data packet */
-	uint8_t payload[] = {0x01};
+	uint8_t payload[] = {0xca, 0xfe};
 
 	/* MAC header */
 	ieee802154_frame_t frame;

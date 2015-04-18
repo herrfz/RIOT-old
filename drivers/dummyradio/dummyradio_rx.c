@@ -47,8 +47,8 @@ void dummyradio_rx_handler(void)
     /* read lqi which is appended after the psdu */
     lqi = buf[dummyradio_rx_buffer[rx_buffer_next].length - 1];
 
-    /* read fcs and rssi, from a register */
-    fcs_rssi = dummyradio_reg_read(DUMMYRADIO_REG__PHY_RSSI);
+    /* dummy fcs and rssi */
+    fcs_rssi = 0xfc;
 
     /* build package */
     dummyradio_rx_buffer[rx_buffer_next].lqi = lqi;
@@ -57,10 +57,10 @@ void dummyradio_rx_handler(void)
     /* bit7, boolean, 1 FCS valid, 0 FCS not valid */
     dummyradio_rx_buffer[rx_buffer_next].crc = (fcs_rssi >> 7) & 0x01;
 
-    // if (dummyradio_rx_buffer[rx_buffer_next].crc == 0) {
-    //     DEBUG("dummyradio: Got packet with invalid crc.\n");
-    //     return;
-    // }
+    if (dummyradio_rx_buffer[rx_buffer_next].crc == 0) {
+        DEBUG("dummyradio: Got packet with invalid crc.\n");
+        return;
+    }
 
 #if ENABLE_DEBUG
     DEBUG("pkg: ");
@@ -107,6 +107,4 @@ void dummyradio_rx_handler(void)
         rx_buffer_next = 0;
     }
 
-    /* Read IRQ to clear it */
-    dummyradio_reg_read(DUMMYRADIO_REG__IRQ_STATUS);
 }

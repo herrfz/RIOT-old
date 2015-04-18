@@ -169,33 +169,8 @@ netdev_802154_tx_status_t dummyradio_transmit_tx_buf(netdev_t *dev)
     /* will be freed in dummyradio_rx_irq when TRX_END interrupt occurs */
     driver_state = AT_DRIVER_STATE_SENDING;
 
-    /* Start TX */
-    dummyradio_reg_write(DUMMYRADIO_REG__TRX_STATE, DUMMYRADIO_TRX_STATE__TX_START);
-
     DEBUG("dummyradio: Started TX\n");
 
-    // if (!wait_for_ack) {
-    //     DEBUG("dummyradio: Don't wait for ACK, TX done.\n");
-    //     return NETDEV_802154_TX_STATUS_OK;
-    // }
-
-    // uint8_t trac_status;
-    // do {
-    //     trac_status = dummyradio_reg_read(DUMMYRADIO_REG__TRX_STATE);
-    //     trac_status &= DUMMYRADIO_TRX_STATE_MASK__TRAC;
-    // }
-    // while (trac_status == DUMMYRADIO_TRX_STATE__TRAC_INVALID);
-
-    // switch (trac_status) {
-    //     case DUMMYRADIO_TRX_STATE__TRAC_CHANNEL_ACCESS_FAILURE:
-    //         return NETDEV_802154_TX_STATUS_MEDIUM_BUSY;
-
-    //     case DUMMYRADIO_TRX_STATE__TRAC_NO_ACK:
-    //         return NETDEV_802154_TX_STATUS_NOACK;
-
-    //     default:
-    //         return NETDEV_802154_TX_STATUS_OK;
-    // }
     return NETDEV_802154_TX_STATUS_OK;
 }
 
@@ -252,30 +227,6 @@ int16_t dummyradio_load(dummyradio_packet_t *packet)
 
     /* generate pkt */
     dummyradio_gen_pkt(pkt, packet);
-
-    /* Go to state PLL_ON */
-    dummyradio_reg_write(DUMMYRADIO_REG__TRX_STATE, DUMMYRADIO_TRX_STATE__PLL_ON);
-
-    // /* wait until it is on PLL_ON state */
-    // do {
-    //     int max_wait = _MAX_RETRIES;
-    //     if (!--max_wait) {
-    //         DEBUG("dummyradio : ERROR : could not enter PLL_ON mode\n");
-    //         break;
-    //     }
-    // } while ((dummyradio_get_status() & DUMMYRADIO_TRX_STATUS_MASK__TRX_STATUS)
-    //          != DUMMYRADIO_TRX_STATUS__PLL_ON);
-
-    /* change into TX_ARET_ON state */
-    dummyradio_reg_write(DUMMYRADIO_REG__TRX_STATE, DUMMYRADIO_TRX_STATE__TX_ARET_ON);
-
-    // do {
-    //     int max_wait = _MAX_RETRIES;
-    //     if (!--max_wait) {
-    //         DEBUG("dummyradio : ERROR : could not enter TX_ARET_ON mode\n");
-    //         break;
-    //     }
-    // } while (dummyradio_get_status() != DUMMYRADIO_TRX_STATUS__TX_ARET_ON);
 
     /* load packet into fifo */
     dummyradio_write_fifo(pkt, packet->length);
