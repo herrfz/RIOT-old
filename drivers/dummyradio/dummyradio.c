@@ -132,8 +132,6 @@ void dummyradio_rx_irq(void)
 {
     /* check if we are in sending state */
     if (driver_state == AT_DRIVER_STATE_SENDING) {
-        /* Read IRQ to clear it */
-        dummyradio_reg_read(DUMMYRADIO_REG__IRQ_STATUS);
         /* tx done, listen again */
         dummyradio_switch_to_rx();
         /* clear internal state */
@@ -259,33 +257,13 @@ int dummyradio_get_monitor(void)
 
 void dummyradio_gpio_spi_interrupts_init(void)
 {
-    // /* SPI init */
-    // spi_acquire(AT86RF231_SPI);
-    // spi_init_master(AT86RF231_SPI, SPI_CONF_FIRST_RISING, SPI_SPEED);
-    // spi_release(AT86RF231_SPI);
-    // /* IRQ0 */
-    // gpio_init_int(AT86RF231_INT, GPIO_NOPULL, GPIO_RISING, (gpio_cb_t)at86rf231_rx_irq, NULL);
-    // /* CS */
-    // gpio_init_out(AT86RF231_CS, GPIO_NOPULL);
-    // /* SLEEP */
-    // gpio_init_out(AT86RF231_SLEEP, GPIO_NOPULL);
-    // /* RESET */
-    // gpio_init_out(AT86RF231_RESET, GPIO_NOPULL);
+    /* interrupt from GPIO_0 */
+    gpio_init_int(GPIO_0, GPIO_NOPULL, GPIO_RISING, (gpio_cb_t)dummyradio_rx_irq, NULL);
 }
 
 void dummyradio_reset(void)
 {
-    // /* force reset */
-    // gpio_clear(AT86RF231_RESET);
 
-    // /* put pins to default values */
-    // gpio_set(AT86RF231_CS);
-    // gpio_clear(AT86RF231_SLEEP);
-
-    //  // additional waiting to comply to min rst pulse width 
-    // uint8_t volatile delay = 50; /* volatile to ensure it isn't optimized away */
-    // while (--delay);
-    // gpio_set(AT86RF231_RESET);
 }
 
 int dummyradio_get_option(netdev_t *dev, netdev_opt_t opt, void *value,
@@ -594,7 +572,6 @@ const netdev_802154_driver_t dummyradio_driver = {
     .get_state = dummyradio_get_state,
     .set_state = dummyradio_set_state,
     .event = dummyradio_event,
-    .load_tx = dummyradio_load_tx_buf,
     .transmit = dummyradio_transmit_tx_buf,
     .send = netdev_802154_send,
     .add_receive_raw_callback = dummyradio_add_raw_recv_callback,

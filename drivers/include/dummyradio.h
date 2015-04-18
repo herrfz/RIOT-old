@@ -321,41 +321,6 @@ int dummyradio_rem_data_recv_callback(netdev_t *dev,
 void dummyradio_rx_handler(void);
 
 /**
- * @brief Prepare the dummyradio TX buffer to send with the given packet.
- *
- * @param[in] dev  The network device to operate on. (Currently not used)
- * @param[in] kind Kind of packet to transmit.
- * @param[in] dest Address of the node to which the packet is sent.
- * @param[in] use_long_addr 1 to use the 64-bit address mode
- *                          with *dest* param; 0 to use
- *                          "short" PAN-centric mode.
- * @param[in] wants_ack 1 to request an acknowledgement
- *                      from the receiving node for this packet;
- *                      0 otherwise.
- * @param[in] upper_layer_hdrs  header data from higher network layers from
- *                              highest to lowest layer. Must be prepended to
- *                              the data stream by the network device. May be
- *                              NULL if there are none.
- * @param[in] buf Pointer to the buffer containing the payload
- *                of the 802.15.4 packet to transmit.
- *                The frame header (i.e.: FCS, sequence number,
- *                src and dest PAN and addresses) is inserted
- *                using values in accord with *kind* parameter
- *                and transceiver configuration.
- * @param[in] len Length (in bytes) of the outgoing packet payload.
- *
- * @return @ref netdev_802154_tx_status_t
- */
-netdev_802154_tx_status_t dummyradio_load_tx_buf(netdev_t *dev,
-                                             netdev_802154_pkt_kind_t kind,
-                                             netdev_802154_node_addr_t *dest,
-                                             int use_long_addr,
-                                             int wants_ack,
-                                             netdev_hlist_t *upper_layer_hdrs,
-                                             void *buf,
-                                             unsigned int len);
-
-/**
  * @brief Transmit the data loaded into the dummyradio TX buffer.
  *
  * @param[in] dev The network device to operate on. (Currently not used)

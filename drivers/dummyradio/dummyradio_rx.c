@@ -62,13 +62,13 @@ void dummyradio_rx_handler(void)
         return;
     }
 
-#if ENABLE_DEBUG
-    DEBUG("pkg: ");
+// #if ENABLE_DEBUG
+    puts("received packet: \n");
     for (int i = 1; i < dummyradio_rx_buffer[rx_buffer_next].length; i++) {
-        DEBUG("%x ", buf[i]);
+        printf("%02x ", buf[i]);
     }
-    DEBUG("\n");
-#endif
+    puts("\n");
+// #endif
 
     /* read buffer into ieee802154_frame */
     ieee802154_frame_read(&buf[1], &dummyradio_rx_buffer[rx_buffer_next].frame,

@@ -25,9 +25,11 @@
 
 #include "dummyradio_spi.h"
 #include "dummyradio.h"
+#include "board.h"
 
-/*                           len   fcf         seq   dstpan      dstaddr     srcpan      srcaddr     payload     lqi  */
+/*                           len   fcf         seq   dstpan      dstaddr     srcpan      srcaddr     payload     lqi */
 static uint8_t fifo_reg[] = {0x0e, 0x01, 0x88, 0x00, 0xff, 0xff, 0xff, 0xff, 0x1c, 0xaa, 0x00, 0x00, 0xca, 0xfe, 0x01};
+static uint8_t irq_status;
 
 void dummyradio_reg_write(uint8_t addr, uint8_t value)
 {
@@ -37,7 +39,7 @@ void dummyradio_reg_write(uint8_t addr, uint8_t value)
 uint8_t dummyradio_reg_read(uint8_t addr)
 {
     puts("dummyradio_reg_read\n");
-    return 0;
+    return irq_status;
 }
 
 void dummyradio_read_fifo(uint8_t *data, radio_packet_length_t length)
@@ -48,11 +50,19 @@ void dummyradio_read_fifo(uint8_t *data, radio_packet_length_t length)
 
 void dummyradio_write_fifo(const uint8_t *data, radio_packet_length_t length)
 {
+#ifdef MODULE_OPENWSN
+    irq_status = DUMMYRADIO_IRQ_STATUS_MASK__RX_START;
+    TRX_INT(); // interrupt, start frame
+#endif
+
     puts("dummyradio_write_fifo \n");
     for (int i = 0; i < length; i++) {
         printf("%02x ", data[i]);
     }
     puts("\n");
+
+    irq_status = DUMMYRADIO_IRQ_STATUS_MASK__TRX_END;
+    TRX_INT(); // interrupt, end frame
 }
 
 uint8_t dummyradio_get_status(void)

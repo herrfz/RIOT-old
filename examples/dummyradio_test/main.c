@@ -78,7 +78,7 @@ int main(void)
 	while(1) {
     	dummyradio_send(&packet);
     	DEBUG("packet sent\n\n");
-    	vtimer_usleep(SEC);
+    	vtimer_usleep(10 * SEC);
 	}
 
 	return 0;

@@ -89,6 +89,12 @@ extern "C" {
 /** @} */
 
 /**
+ * Define software/fake transceiver interrupt 
+ * here using line 13 (PC13 user button) 
+ */
+#define TRX_INT()           EXTI->SWIER |= EXTI_SWIER_SWIER13;
+
+/**
  * Define the type for the radio packet length for the transceiver
  */
 typedef uint8_t radio_packet_length_t;
