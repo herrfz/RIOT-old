@@ -19,12 +19,27 @@
  */
 #include "vtimer.h"
 #include "dummyradio.h"
+#include "thread.h"
+#include "riot.h"
+
+#include "board_ow.h"
+#include "leds.h"
+#include "scheduler.h"
+#include "openstack.h"
+#include "opendefs.h"
 
 #define MSEC (1000)
 #define SEC (1000 * MSEC)
 
 #define ENABLE_DEBUG (1)
 #include "debug.h"
+
+#define PRIORITY_OPENWSN            PRIORITY_MAIN-1
+
+void* openwsn_start(void *arg);
+
+uint8_t owsn_mop = 1; // openwsn root
+static char openwsn_stack[KERNEL_CONF_STACKSIZE_MAIN*2];
 
 int main(void)
 {
@@ -75,6 +90,10 @@ int main(void)
 	uint8_t status = dummyradio_get_status();
 	DEBUG("status: %x\n", status);
 
+    thread_create(openwsn_stack, KERNEL_CONF_STACKSIZE_MAIN,
+                    PRIORITY_OPENWSN, CREATE_STACKTEST,
+                    openwsn_start, (void*)&owsn_mop, "openwsn thread");
+
 	while(1) {
     	dummyradio_send(&packet);
     	DEBUG("packet sent\n\n");
@@ -82,4 +101,15 @@ int main(void)
 	}
 
 	return 0;
+}
+
+void* openwsn_start(void *arg) {
+    DEBUG("%s\n",__PRETTY_FUNCTION__);
+    leds_all_off();
+    board_init_ow();
+    scheduler_init();
+    openstack_init(*((uint8_t*)arg));
+    puts("DONE");
+    scheduler_start();
+    return NULL;
 }

@@ -36,6 +36,8 @@ void dummyradio_write_fifo(const uint8_t *data, radio_packet_length_t length);
 
 uint8_t dummyradio_get_status(void);
 
+void* dummyradio_receive_int(void *arg);
+
 #ifdef __cplusplus
 }
 #endif

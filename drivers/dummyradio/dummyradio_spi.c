@@ -26,6 +26,8 @@
 #include "dummyradio_spi.h"
 #include "dummyradio.h"
 #include "board.h"
+#include "vtimer.h"
+#include "msg.h"
 
 /*                           len   fcf         seq   dstpan      dstaddr     srcpan      srcaddr     payload     lqi */
 static uint8_t fifo_reg[] = {0x0e, 0x01, 0x88, 0x00, 0xff, 0xff, 0xff, 0xff, 0x1c, 0xaa, 0x00, 0x00, 0xca, 0xfe, 0x01};
@@ -45,6 +47,8 @@ uint8_t dummyradio_reg_read(uint8_t addr)
 void dummyradio_read_fifo(uint8_t *data, radio_packet_length_t length)
 {
     memcpy(data, fifo_reg, length);
+    irq_status = DUMMYRADIO_IRQ_STATUS_MASK__TRX_END;
+    TRX_INT(); // interrupt, end frame
     printf("dummyradio_read_fifo: %d\n", length);
 }
 
@@ -69,4 +73,15 @@ uint8_t dummyradio_get_status(void)
 {
     puts("dummyradio_get_status\n");
     return 0;
+}
+
+void* dummyradio_receive_int(void *arg)
+{
+    msg_t msg;
+    while(1) {
+        msg_receive(&msg);
+        vtimer_usleep(15000); // TODO timeslot width
+        irq_status = DUMMYRADIO_IRQ_STATUS_MASK__RX_START;
+        TRX_INT(); // interrupt reception
+    }
 }

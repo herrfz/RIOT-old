@@ -16,9 +16,16 @@ CFLAGS += -DDEVELHELP
 QUIET ?= 1
 
 USEMODULE += vtimer
-USEMODULE += ps
 USEMODULE += dummyradio
 USEMODULE += netdev_802154
 USEMODULE += ieee802154
 
+USEPKG += openwsn
+
 include $(RIOTBASE)/Makefile.include
+
+INCLUDES +=	-I$(RIOTBASE)/../openwsn/bsp/boards \
+			-I$(RIOTBASE)/../openwsn/kernel \
+			-I$(RIOTBASE)/../openwsn/openstack \
+			-I$(RIOTBASE)/../openwsn/inc \
+			-I$(RIOTBASE)/../openwsn/bsp/boards/dummyriot

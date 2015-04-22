@@ -30,6 +30,7 @@
 #include "transceiver.h"
 #include "hwtimer.h"
 #include "config.h"
+#include "thread.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -41,6 +42,8 @@
 #endif
 
 #define _MAX_RETRIES    (100)
+
+#define PRIORITY_OPENWSN            PRIORITY_MAIN-1
 
 static uint16_t radio_pan;
 static uint8_t  radio_channel;
@@ -56,6 +59,8 @@ static size_t _default_src_addr_len = 2;
 uint8_t  driver_state;
 int      monitor_mode;
 
+static char dummyradio_stack[KERNEL_CONF_STACKSIZE_MAIN];
+
 void dummyradio_gpio_spi_interrupts_init(void);
 void dummyradio_reset(void);
 
@@ -70,9 +75,7 @@ void dummyradio_init(kernel_pid_t tpid)
 int dummyradio_initialize(netdev_t *dev)
 {
     dummyradio_gpio_spi_interrupts_init();
-
     dummyradio_reset();
-
     dummyradio_on();
 
     /* TODO :
@@ -85,13 +88,19 @@ int dummyradio_initialize(netdev_t *dev)
 #endif
 
     radio_channel = 0;
-
     radio_address = 0x010F;
-
     radio_address_long = 0x010203040506010F;
+
+#ifdef MODULE_OPENWSN
+    thread_create(dummyradio_stack, KERNEL_CONF_STACKSIZE_MAIN,
+                    PRIORITY_OPENWSN, CREATE_STACKTEST,
+                    dummyradio_receive_int, NULL, "dummyradio rx thread");
+#endif
 
     return 0;
 }
+
+
 
 int dummyradio_on(void)
 {
@@ -192,7 +201,6 @@ int dummyradio_rem_data_recv_callback(netdev_t *dev,
 radio_address_t dummyradio_set_address(radio_address_t address)
 {
     radio_address = address;
-
     return radio_address;
 }
 
@@ -204,7 +212,6 @@ radio_address_t dummyradio_get_address(void)
 uint64_t dummyradio_set_address_long(uint64_t address)
 {
     radio_address_long = address;
-
     return radio_address_long;
 }
 
@@ -216,7 +223,6 @@ uint64_t dummyradio_get_address_long(void)
 uint16_t dummyradio_set_pan(uint16_t pan)
 {
     radio_pan = pan;
-
     return radio_pan;
 }
 
