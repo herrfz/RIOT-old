@@ -36,6 +36,12 @@ static uint8_t irq_status;
 void dummyradio_reg_write(uint8_t addr, uint8_t value)
 {
     printf("dummyradio_reg_write: %02x\n", value);
+    if (addr == DUMMYRADIO_REG__IRQ_STATUS) {
+        irq_status = value;
+        if (value == DUMMYRADIO_IRQ_STATUS_MASK__TRX_END) {
+            TRX_INT(); // fake end-of-frame interrupt
+        }
+    }
 }
 
 uint8_t dummyradio_reg_read(uint8_t addr)
