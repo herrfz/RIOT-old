@@ -56,10 +56,11 @@ netdev_rcv_data_cb_t dummyradio_data_packet_cb;
 /* default source address length for sending in number of byte */
 static size_t _default_src_addr_len = 2;
 
-uint8_t  driver_state;
-int      monitor_mode;
+uint8_t         driver_state;
+int             monitor_mode;
+kernel_pid_t    dummyradio_faketrx_pid;
 
-static char dummyradio_stack[KERNEL_CONF_STACKSIZE_MAIN];
+static char dummyradio_faketrx_stack[KERNEL_CONF_STACKSIZE_MAIN];
 
 void dummyradio_gpio_spi_interrupts_init(void);
 void dummyradio_reset(void);
@@ -92,9 +93,10 @@ int dummyradio_initialize(netdev_t *dev)
     radio_address_long = 0x010203040506010F;
 
 #ifdef MODULE_OPENWSN
-    thread_create(dummyradio_stack, KERNEL_CONF_STACKSIZE_MAIN,
-                    PRIORITY_OPENWSN, CREATE_STACKTEST,
-                    dummyradio_receive_int, NULL, "dummyradio rx thread");
+    dummyradio_faketrx_pid = thread_create(
+            dummyradio_faketrx_stack, KERNEL_CONF_STACKSIZE_MAIN,
+            PRIORITY_OPENWSN, CREATE_STACKTEST,
+            dummyradio_faketrx, NULL, "faketrx thread");
 #endif
 
     return 0;

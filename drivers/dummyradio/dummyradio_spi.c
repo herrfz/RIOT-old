@@ -40,7 +40,7 @@ void dummyradio_reg_write(uint8_t addr, uint8_t value)
 
 uint8_t dummyradio_reg_read(uint8_t addr)
 {
-    puts("dummyradio_reg_read\n");
+    printf("dummyradio_reg_read addr: %02x\n", addr);
     return irq_status;
 }
 
@@ -48,25 +48,17 @@ void dummyradio_read_fifo(uint8_t *data, radio_packet_length_t length)
 {
     memcpy(data, fifo_reg, length);
     irq_status = DUMMYRADIO_IRQ_STATUS_MASK__TRX_END;
-    TRX_INT(); // interrupt, end frame
+    //TRX_INT(); // interrupt, end frame
     printf("dummyradio_read_fifo: %d\n", length);
 }
 
 void dummyradio_write_fifo(const uint8_t *data, radio_packet_length_t length)
 {
-#ifdef MODULE_OPENWSN
-    irq_status = DUMMYRADIO_IRQ_STATUS_MASK__RX_START;
-    TRX_INT(); // interrupt, start frame
-#endif
-
-    puts("dummyradio_write_fifo \n");
+    puts("dummyradio_write_fifo");
     for (int i = 0; i < length; i++) {
         printf("%02x ", data[i]);
     }
-    puts("\n");
-
-    irq_status = DUMMYRADIO_IRQ_STATUS_MASK__TRX_END;
-    TRX_INT(); // interrupt, end frame
+    printf("\n");
 }
 
 uint8_t dummyradio_get_status(void)
@@ -75,13 +67,13 @@ uint8_t dummyradio_get_status(void)
     return 0;
 }
 
-void* dummyradio_receive_int(void *arg)
+void* dummyradio_faketrx(void *arg)
 {
     msg_t msg;
     while(1) {
         msg_receive(&msg);
-        vtimer_usleep(15000); // TODO timeslot width
-        irq_status = DUMMYRADIO_IRQ_STATUS_MASK__RX_START;
-        TRX_INT(); // interrupt reception
+        //vtimer_usleep(15000); // TODO timeslot width
+        //irq_status = msg.content.value;
+        TRX_INT(); // interrupt
     }
 }

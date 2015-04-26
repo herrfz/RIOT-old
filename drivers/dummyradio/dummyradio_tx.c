@@ -52,6 +52,7 @@ netdev_802154_tx_status_t dummyradio_transmit_tx_buf(netdev_t *dev)
 {
     (void)dev;
 
+    dummyradio_reg_write(DUMMYRADIO_REG__TRX_STATE, DUMMYRADIO_TRX_STATE__TX_START);
     DEBUG("dummyradio: Started TX\n");
 
     return NETDEV_802154_TX_STATUS_OK;
