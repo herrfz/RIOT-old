@@ -315,7 +315,7 @@ static void *run(void *arg)
             case RCV_PKT_CC2420:
             case RCV_PKT_MC1322X:
             case RCV_PKT_NATIVE:
-            case RCV_PKT_AT86RF231
+            case RCV_PKT_AT86RF231:
             case RCV_PKT_DUMMYRADIO:
                 receive_packet(m.type, m.content.value);
                 break;
