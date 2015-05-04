@@ -29,14 +29,15 @@
 #include "vtimer.h"
 #include "msg.h"
 
-#define SAMPLES 300
+#define SAMPLES 50
 #define DEBUG   1
 #define VERBOSE 0
 
 
 /*                           len   fcf         seq   dstpan      dstaddr     srcpan      srcaddr     payload     lqi */
 static uint8_t fifo_reg[] = {0x0e, 0x01, 0x88, 0x00, 0xff, 0xff, 0xff, 0xff, 0x1c, 0xaa, 0x00, 0x00, 0xca, 0xfe, 0x01};
-static uint8_t irq_status;
+static uint8_t beacon[] = {0x3e, 0x40, 0xea, 0x00, 0xfe, 0xca, 0xff, 0xff, 0x30, 0x34, 0x51, 0x10, 0x00, 0x59, 0x00, 0x6c, 0xa3, 0x05, 0x34, 0x06, 0x2f, 0x0a, 0x00, 0x00, 0x00, 0x00, 0x36, 0x23, 0x01, 0x01, 0x65, 0x00, 0x06, 0x01, 0x00, 0x00, 0x00, 0xf0, 0x02, 0x00, 0x00, 0x00, 0xe0, 0x03, 0x00, 0x00, 0x00, 0xe0, 0x04, 0x00, 0x00, 0x00, 0xe0, 0x05, 0x00, 0x00, 0x00, 0xe0, 0x06, 0x00, 0x00, 0x00, 0xe0, 0x01};
+static uint8_t irq_status, fifopointer = 0, rxcount = 2;
 int calls = 0;
 static uint32_t callingtime[SAMPLES];
 void capture_time(void);
@@ -65,7 +66,16 @@ uint8_t dummyradio_reg_read(uint8_t addr)
 
 void dummyradio_read_fifo(uint8_t *data, radio_packet_length_t length)
 {
-    memcpy(data, fifo_reg, length);
+    if (rxcount) { // first two calls for node are beacon length and beacon
+        if (fifopointer > sizeof(beacon)) fifopointer = 0;
+        memcpy(data, &beacon[fifopointer], length);
+        fifopointer += length;
+        rxcount--;
+    } else {
+        if (fifopointer > sizeof(fifo_reg)) fifopointer = 0;
+        memcpy(data, &fifo_reg[fifopointer], length);
+        fifopointer += length;
+    }
     irq_status = DUMMYRADIO_IRQ_STATUS_MASK__TRX_END;
 #if VERBOSE
     printf("dummyradio_read_fifo: %d\n", length);
