@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2015 Eriza Fazli
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -9,14 +9,13 @@
 /**
  * @defgroup    drivers_dummyradio dummyradio
  * @ingroup     drivers
- * @brief       Device driver for the Atmel DUMMYRADIO radio
+ * @brief       Device driver for the DUMMYRADIO radio
  * @{
  *
  * @file
  * @brief       Interface definition for the DUMMYRADIO device driver
  *
- * @author      Alaeddine Weslati <alaeddine.weslati@inria.fr>
- * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
+ * @author      Eriza Fazli <erizzaaaaa@gmail.com>
  */
 
 #ifndef DUMMYRADIO_H_

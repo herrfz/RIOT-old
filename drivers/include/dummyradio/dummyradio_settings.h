@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 INRIA
+ * Copyright (C) 2015 Eriza Fazli
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,7 +13,7 @@
  * @file
  * @brief       Register and command definitions for the DUMMYRADIO radio
  *
- * @author      Alaeddine Weslati <alaeddine.weslati@inria.fr>
+ * @author      Eriza Fazli <erizzaaaaa@gmail.com>
  */
 
 #ifndef DUMMYRADIO_SETTINGS_H

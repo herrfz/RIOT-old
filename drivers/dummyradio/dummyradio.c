@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Alaeddine Weslati <alaeddine.weslati@inria.fr>
+ * Copyright (C) 2015 Eriza Fazli <erizzaaaaa@gmail.com>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,8 +13,7 @@
  * @file
  * @brief       Driver implementation of the DUMMYRADIO device driver
  *
- * @author      Alaeddine Weslati <alaeddine.weslati@inria.fr>
- * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
+ * @author      Eriza Fazli <erizzaaaaa@gmail.com>
  *
  * @}
  */
@@ -102,11 +101,8 @@ int dummyradio_initialize(netdev_t *dev)
     return 0;
 }
 
-
-
 int dummyradio_on(void)
 {
-    printf("dummyradio_on\n");
     return 1;
 }
 

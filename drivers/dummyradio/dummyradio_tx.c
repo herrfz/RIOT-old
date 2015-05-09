@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 INRIA
+ * Copyright (C) 2015 Eriza Fazli
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,8 +13,7 @@
  * @file
  * @brief       TX related functionality for the DUMMYRADIO device driver
  *
- * @author      Alaeddine Weslati <alaeddine.weslati@inria.fr>
- * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
+ * @author      Eriza Fazli <erizzaaaaa@gmail.com>
  *
  * @}
  */
