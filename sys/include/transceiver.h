@@ -87,6 +87,13 @@
 #endif
 #endif
 
+#ifdef MODULE_DUMMYRADIO
+#include "dummyradio.h"
+#ifndef TRANSCEIVER_DEFAULT
+#define TRANSCEIVER_DEFAULT TRANSCEIVER_DUMMYRADIO
+#endif
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -131,6 +138,12 @@ extern "C" {
 #undef PAYLOAD_SIZE
 #define PAYLOAD_SIZE  (AT86RF231_MAX_DATA_LENGTH)
 #define TRANSCEIVER_BROADCAST  AT86RF231_BROADCAST_ADDRESS
+#endif
+#endif
+#ifdef MODULE_DUMMYRADIO
+#if (DUMMYRADIO_MAX_DATA_LENGTH > PAYLOAD_SIZE)
+#undef PAYLOAD_SIZE
+#define PAYLOAD_SIZE  (DUMMYRADIO_MAX_DATA_LENGTH)
 #endif
 #endif
 #ifdef MODULE_MC1322X
@@ -178,6 +191,7 @@ extern "C" {
 #define TRANSCEIVER_MC1322X     (0x08)      /**< MC1322X transceivers */
 #define TRANSCEIVER_NATIVE      (0x10)      /**< NATIVE transceivers */
 #define TRANSCEIVER_AT86RF231   (0x20)      /**< AT86RF231 transceivers */
+#define TRANSCEIVER_DUMMYRADIO  (0x40)      /**< DUMMYRADIO transceivers */
 /**
  * @}
  */
@@ -203,6 +217,7 @@ enum transceiver_msg_type_t {
     RCV_PKT_MC1322X,       /**< packet was received by mc1322x transceiver */
     RCV_PKT_NATIVE,        /**< packet was received by native transceiver */
     RCV_PKT_AT86RF231,     /**< packet was received by AT86RF231 transceiver */
+    RCV_PKT_DUMMYRADIO,     /**< packet was received by DUMMYRADIO transceiver */
 
     /* Message types for transceiver <-> upper layer communication */
     PKT_PENDING,    /**< packet pending in transceiver buffer */
