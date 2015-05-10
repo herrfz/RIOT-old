@@ -21,7 +21,6 @@
 #include <stdio.h>
 #include "thread.h"
 #include "mutex.h"
-#include <ps.h>
 
 static mutex_t mutex = MUTEX_INIT;
 static volatile int indicator, count;
@@ -36,8 +35,6 @@ static void *second_thread(void *arg)
         thread_wakeup(main_pid);
         indicator--;
         mutex_unlock_and_sleep(&mutex);
-        thread_print_all();
-		printf("\n\n");
     }
     return NULL;
 }
@@ -62,8 +59,6 @@ int main(void)
         thread_wakeup(second_pid);
         indicator++;
         count++;
-        thread_print_all();
-		printf("\n\n");
 
         if (indicator > 1 || indicator < -1) {
             printf("Error, threads did not sleep properly. [indicator: %d]\n", indicator);

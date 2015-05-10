@@ -99,7 +99,7 @@ void *radio(void *arg)
             printf("\tRSSI:\t%u\n", p->rssi);
 
             for (i = 0; i < p->length; i++) {
-                puts("%02X ", p->data[i]);
+                printf("%02X ", p->data[i]);
             }
 
             p->processing--;
