@@ -68,7 +68,7 @@ void dummyradio_read_fifo(uint8_t *data, radio_packet_length_t length)
         if (fifopointer > sizeof(beacon)) fifopointer = 0;
         memcpy(data, &beacon[fifopointer], length);
         bccount--;
-    } else if (rxcount%29 == 0 || rxcount%29==1) { // receives KA only after 29 counts 
+    } else if (rxcount%2 == 0 || rxcount%2==1) { // ALWAYS receive KA in every slot
         if (fifopointer > sizeof(fifo_reg)) fifopointer = 0;
         memcpy(data, &fifo_reg[fifopointer], length);
     }
