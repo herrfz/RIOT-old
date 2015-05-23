@@ -90,19 +90,18 @@ static void clk_init(void)
     // RCC->CFGR |= (uint32_t)RCC_CFGR_MCO_HSI;
     RCC->AHBENR |= RCC_AHBENR_DMA1EN;
 
-    /* TODO: Re-implement HSE clock configuration
-     * These lines are commented because VESNA has no HSE
-     * i.e. we use just HSI, no PLL */
-    // /*  PLL configuration: PLLCLK = HSE / HSE_DIV * HSE_MUL */
-    // RCC->CFGR &= ~((uint32_t)(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMULL));
-    // RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_HSE | CLOCK_PLL_HSE_DIV | CLOCK_PLL_HSE_MUL);
-    // /* Enable PLL */
-    // RCC->CR |= RCC_CR_PLLON;
-    // /* Wait till PLL is ready 
-    // while ((RCC->CR & RCC_CR_PLLRDY) == 0);
-    // /* Select PLL as system clock source */
-    // RCC->CFGR &= ~((uint32_t)(RCC_CFGR_SW));
-    // RCC->CFGR |= (uint32_t)RCC_CFGR_SW_PLL;
-    // /* Wait till PLL is used as system clock source */
-    // while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL);
+#if CLOCK_HSE
+    /*  PLL configuration: PLLCLK = HSE / HSE_DIV * HSE_MUL */
+    RCC->CFGR &= ~((uint32_t)(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMULL));
+    RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_HSE | CLOCK_PLL_HSE_DIV | CLOCK_PLL_HSE_MUL);
+    /* Enable PLL */
+    RCC->CR |= RCC_CR_PLLON;
+    /* Wait till PLL is ready */
+    while ((RCC->CR & RCC_CR_PLLRDY) == 0);
+    /* Select PLL as system clock source */
+    RCC->CFGR &= ~((uint32_t)(RCC_CFGR_SW));
+    RCC->CFGR |= (uint32_t)RCC_CFGR_SW_PLL;
+    /* Wait till PLL is used as system clock source */
+    while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL);
+#endif
 }
