@@ -97,15 +97,16 @@ extern "C" {
 /**
  * serial-line interrupt macros
  */
-#define RXNEIE_MASK                 (1 << 5) // RXNEIE is bit 5 of USART CR1 and SR egister
-#define TXEIE_MASK                  (1 << 7) // TXEIE is bit 7 of USART CR1 and SR register
-#define USART2_ENABLE_RXINTERRUPT   UART_0_DEV->CR1 |= RXNEIE_MASK
-#define USART2_ENABLE_TXINTERRUPT   UART_0_DEV->CR1 |= TXEIE_MASK
-#define USART2_DISABLE_RXINTERRUPT  UART_0_DEV->CR1 &= ~RXNEIE_MASK
-#define USART2_DISABLE_TXINTERRUPT  UART_0_DEV->CR1 &= ~TXEIE_MASK
+#define UART_0_ENABLE_RXINTERRUPT   UART_0_DEV->CR1 |= USART_CR1_RXNEIE
+#define UART_0_ENABLE_TXINTERRUPT   UART_0_DEV->CR1 |= USART_CR1_TXEIE
+#define UART_0_DISABLE_RXINTERRUPT  UART_0_DEV->CR1 &= ~USART_CR1_RXNEIE
+#define UART_0_DISABLE_TXINTERRUPT  UART_0_DEV->CR1 &= ~USART_CR1_TXEIE
 
-#define USART2_CLEAR_RXFLAG         UART_0_DEV->SR  &= ~RXNEIE_MASK
-#define USART2_CLEAR_TXFLAG         UART_0_DEV->SR  &= ~TXEIE_MASK
+#define UART_0_CLEAR_RXFLAG         UART_0_DEV->SR  &= ~USART_SR_RXNE
+#define UART_0_CLEAR_TXFLAG         UART_0_DEV->SR  &= ~USART_SR_TXE
+
+// UART busy := TXE == 0 after software writes to USART_DR while TXEIE == 1
+#define UART_0_TXBUSY               ~(UART_0_DEV->SR & USART_SR_TXE)
 
 /**
  * Define the type for the radio packet length for the transceiver
