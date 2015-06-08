@@ -89,10 +89,23 @@ extern "C" {
 /** @} */
 
 /**
- * Define software/fake transceiver interrupt 
+ * software/fake transceiver interrupt macro 
  * here using line 13 (PC13 user button) 
  */
-#define TRX_INT()           EXTI->SWIER |= EXTI_SWIER_SWIER13;
+#define TRX_INT()                   EXTI->SWIER |= EXTI_SWIER_SWIER13;
+
+/**
+ * serial-line interrupt macros
+ */
+#define RXNEIE_MASK                 (1 << 5) // RXNEIE is bit 5 of USART CR1 and SR egister
+#define TXEIE_MASK                  (1 << 7) // TXEIE is bit 7 of USART CR1 and SR register
+#define USART2_ENABLE_RXINTERRUPT   UART_0_DEV->CR1 |= RXNEIE_MASK
+#define USART2_ENABLE_TXINTERRUPT   UART_0_DEV->CR1 |= TXEIE_MASK
+#define USART2_DISABLE_RXINTERRUPT  UART_0_DEV->CR1 &= ~RXNEIE_MASK
+#define USART2_DISABLE_TXINTERRUPT  UART_0_DEV->CR1 &= ~TXEIE_MASK
+
+#define USART2_CLEAR_RXFLAG         UART_0_DEV->SR  &= ~RXNEIE_MASK
+#define USART2_CLEAR_TXFLAG         UART_0_DEV->SR  &= ~TXEIE_MASK
 
 /**
  * Define the type for the radio packet length for the transceiver
