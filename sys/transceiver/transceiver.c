@@ -183,7 +183,7 @@ void transceiver_init(transceiver_type_t t)
     }
 
     /* check if a non defined bit is set */
-    if (t & ~(TRANSCEIVER_CC1100 | TRANSCEIVER_CC2420 | TRANSCEIVER_MC1322X | TRANSCEIVER_NATIVE | TRANSCEIVER_AT86RF231 || TRANSCEIVER_DUMMYRADIO)) {
+    if (t & ~(TRANSCEIVER_CC1100 | TRANSCEIVER_CC2420 | TRANSCEIVER_MC1322X | TRANSCEIVER_NATIVE | TRANSCEIVER_AT86RF231 | TRANSCEIVER_DUMMYRADIO)) {
         puts("Invalid transceiver type");
     }
     else {
