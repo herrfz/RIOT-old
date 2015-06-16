@@ -94,8 +94,6 @@ extern "C" {
 #define LED_RED_OFF             
 #define LED_RED_TOGGLE          
 
-#define LED_GREEN_TOGGLE        
-
 #define LED_ORANGE_ON              
 #define LED_ORANGE_OFF             
 #define LED_ORANGE_TOGGLE          
@@ -108,6 +106,7 @@ extern "C" {
 
 #define LED_GREEN_ON        (LED_GREEN_PORT->BSRR = (1<<LED_GREEN_PIN))
 #define LED_GREEN_OFF       (LED_GREEN_PORT->BRR = (1<<LED_GREEN_PIN))
+#define LED_GREEN_TOGGLE    (LED_GREEN_PORT->ODR ^= (1<<LED_GREEN_PIN))
 /** @} */
 
 /**
