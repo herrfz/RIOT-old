@@ -392,14 +392,25 @@ unsigned int at86rf231_get_channel(void)
 
 void at86rf231_set_monitor(int mode)
 {
-    /* read register */
-    uint8_t tmp = at86rf231_reg_read(AT86RF231_REG__XAH_CTRL_1);
+    /* read registers */
+    uint8_t csma_seed_1 = at86rf231_reg_read(AT86RF231_REG__CSMA_SEED_1);
+    uint8_t xah_ctrl_0 = at86rf231_reg_read(AT86RF231_REG__XAH_CTRL_0);
+    uint8_t xah_ctrl_1  = at86rf231_reg_read(AT86RF231_REG__XAH_CTRL_1);    
     /* set promicuous mode depending on *mode* */
     if (mode) {
-        at86rf231_reg_write(AT86RF231_REG__XAH_CTRL_1, (tmp|AT86RF231_XAH_CTRL_1__AACK_PROM_MODE));
+        // set promiscuous mode
+        at86rf231_reg_write(AT86RF231_REG__XAH_CTRL_1, (xah_ctrl_1 | AT86RF231_XAH_CTRL_1__AACK_PROM_MODE));    
+        // on RX_AACK receive: do not send acknowledgment
+        at86rf231_reg_write(AT86RF231_REG__CSMA_SEED_1, csma_seed_1 | AT86RF231_CSMA_SEED_1__AACK_DIS_ACK);
+    #ifdef MODULE_OPENWSN
+        // on TX_ARET transmit: do not retransmit if no ack is received
+        // openwsn sends its own ack in software
+        at86rf231_reg_write(AT86RF231_REG__XAH_CTRL_0, xah_ctrl_0 & ~(AT86RF231_XAH_CTRL_0__MAX_FRAME_RETRES));
+    #endif    
     }
     else {
-        at86rf231_reg_write(AT86RF231_REG__XAH_CTRL_1, (tmp&(~AT86RF231_XAH_CTRL_1__AACK_PROM_MODE)));
+        at86rf231_reg_write(AT86RF231_REG__XAH_CTRL_1, (xah_ctrl_1 & (~AT86RF231_XAH_CTRL_1__AACK_PROM_MODE)));
+        at86rf231_reg_write(AT86RF231_REG__CSMA_SEED_1, (csma_seed_1 & (~AT86RF231_CSMA_SEED_1__AACK_DIS_ACK)));
     }
 }
 
